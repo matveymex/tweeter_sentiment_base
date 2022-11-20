@@ -30,3 +30,4 @@ tqdm==4.64.1
 translate==3.6.1
 tweepy==4.12.1
 urllib3==1.26.12
+python-dotenv==0.21.0

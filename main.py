@@ -6,30 +6,28 @@ import cld3
 from translate import Translator
 import numpy as np
 import re
+
 load_dotenv()
 
-GCP_PROJECT_ID = os.getenv('GCP_PROJECT_ID')
-SERVICE_ACCOUNT_FILE = os.getenv('SERVICE_ACCOUNT_FILE')
-STORAGE_BUCKET_NAME = os.getenv('STORAGE_BUCKET_NAME')
+bearer_token = os.getenv('BEARER_TOKEN')
 
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAAJ9iwEAAAAAKIWh0ZjbHlQB43E7Lbtj7EqHc50%3DYoak3F7KwnPUDBcdTLNmqKr2YWoGzJW74uMfLKwlxo4XfQvbrh"
 client = tweepy.Client(bearer_token)
 
 
-def get_tweets(query: str):  # pull tweets
+def get_tweets(us_query: str):  # pull tweets
 
-    query = f'{query} -is:retweet'
-    response = client.search_recent_tweets(query=query, max_results=100, sort_order="recency")
+    us_query = f'{us_query} -is:retweet'
+    response = client.search_recent_tweets(query=us_query, max_results=100, sort_order="recency")
     tweets = response.data
     return (tweets)
 
 
 def drop_links(text):  # drop links
-    return (re.sub('http://\S+|https://\S+', '', text))
+    return re.sub('http://\S+|https://\S+', '', text)
 
 
 def drop_ids(text):  # drop links
-    return (re.sub('@\S+', '', text))
+    return re.sub('@\S+', '', text)
 
 
 def clean_tweet(text):
@@ -45,7 +43,6 @@ def is_english(text):  # check language
 
 
 def tweet_analysis(user_query: str):
-    global translation
     tweets = get_tweets(user_query)
     polarities = []
     subjectivities = []
@@ -82,8 +79,10 @@ def tweet_analysis(user_query: str):
 
     return {'polarity': polarities, 'subjectivity': subjectivities}
 
+
 def get_weighted_polarity_mean(valid_tweets):
-    return np.average(valid_tweets['polarity'],weights=valid_tweets['subjectivity'])
+    return np.average(valid_tweets['polarity'], weights=valid_tweets['subjectivity'])
+
 
 def print_result(mean):
     if mean > 0.0:
@@ -92,6 +91,7 @@ def print_result(mean):
         print('NEUTRO')
     else:
         print('NEGATIVE')
+
 
 if __name__ == "__main__":
     query = input("Query: ")
